@@ -1,5 +1,5 @@
 
-name: Build & push docker Image to ECR
+name: Build & push docker Image to ECR with Docker command 
 
 on:
   push:
