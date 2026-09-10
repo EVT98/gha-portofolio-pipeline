@@ -28,4 +28,4 @@ jobs:
         with:
           content : .
           push: true
-          tags: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ ECR_REPOSITORY}}:v${{ github.run_number }}
+          tags: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY}}:v${{ github.run_number }}

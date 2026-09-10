@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build-push:
-    runs-on: ubuntu-latest:
+    runs-on: ubuntu-latest
     steps:
 
       - uses: actions/checkout@v4
@@ -31,4 +31,9 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.output.registry }}
           IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/${{ vars.ECR_REPOSITORY}}:$IMAGE_TAG
+          docker push $ECR_REGISTRY/${{ vars.ECR_REPOSITORY}}:$IMAGE_TAG
+
+
         
