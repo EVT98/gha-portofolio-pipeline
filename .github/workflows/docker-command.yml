@@ -52,6 +52,9 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Scan image with Trivy
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: '$ECR_REGISTRY/${{ vars.ECR_REPOSITORY}}:$IMAGE_TAG'
@@ -74,6 +77,28 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ECS }}
           aws-region: ${{ vars.AWS_REGION }}
   
+      - name: Download current task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition portfolioTask \
+            --query taskDefinition \
+            > task-definition.json
+
+      - name: Update image in task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: portfolio
+          image: $ECR_REGISTRY/${{ vars.ECR_REPOSITORY}}:$IMAGE_TAG
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: myapp-service
+          cluster: myapp-cluster
+          wait-for-service-stability: true
 
 
         
