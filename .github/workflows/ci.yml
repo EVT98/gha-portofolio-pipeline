@@ -79,7 +79,6 @@ jobs:
             --service portfolioService \
             --force-new-deployment
 
-
         
 
 
