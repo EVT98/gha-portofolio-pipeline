@@ -87,14 +87,14 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: portfolio
-          image: $${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${{ github.sha }}
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${{ github.sha }}
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: myapp-service
-          cluster: myapp-cluster
+          service: portfolioService
+          cluster: portfolio-cluster
           wait-for-service-stability: true
 
 
