@@ -2,7 +2,7 @@
 name: Build & push docker Image to ECR with Docker command 
 
 on:
-  push:
+  workflow_dispatch:
     branches: [main]
 
 permissions:
