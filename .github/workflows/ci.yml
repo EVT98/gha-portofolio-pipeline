@@ -2,7 +2,7 @@
 name: Build & push docker Image to ECR
 
 on:
-  workflow_dispatch:
+  push:
     branches: [main]
 
 permissions:
@@ -72,28 +72,12 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ECS }}
           aws-region: ${{ vars.AWS_REGION }}
   
-      - name: Download current task definition
+      - name: Update ECS Service
         run: |
-          aws ecs describe-task-definition \
-            --task-definition portfolioTask \
-            --query taskDefinition \
-            > task-definition.json
-
-      - name: Update image in task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          container-name: portfolio
-          image: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY }}:v${{ github.run_number }}
-
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: myapp-service
-          cluster: myapp-cluster
-          wait-for-service-stability: true
+          aws ecs update-service \
+            --cluster portfolio-cluster \
+            --service portfolioService \
+            --force-new-deployment
 
 
         

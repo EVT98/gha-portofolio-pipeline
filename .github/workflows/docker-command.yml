@@ -28,12 +28,9 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
       
       - name: Build, tag, push
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/${{ vars.ECR_REPOSITORY}}:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/${{ vars.ECR_REPOSITORY}}:$IMAGE_TAG
+          docker build -t ${{ secrets.ECR_REGISTRY}}/${{ vars.ECR_REPOSITORY}}:docker-command-v${{ github.run_number }} .
+          docker push ${{ secrets.ECR_REGISTRY}}/${{ vars.ECR_REPOSITORY}}:docker-command-v${{ github.run_number }}
 
   scan:
     needs: build-push
@@ -54,7 +51,7 @@ jobs:
       - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${{ github.sha }}'
+          image-ref: '${{ secrets.ECR_REGISTRY}}/${{ vars.ECR_REPOSITORY}}:docker-command-v${{ github.run_number }}'
           format: 'table'
           exit-code: '0' #logiquement, je devrais mettre 1 que le workflow s'arrête en cas de vulnerabilité HIGH ou CRITICAL. Je mets 0 pour qu'il continue dans l'objectif d'aller au bout du workflow
           ignore-unfixed: true
@@ -87,7 +84,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: portfolio
-          image: ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${{ github.sha }}
+          image: ${{ secrets.ECR_REGISTRY}}/${{ vars.ECR_REPOSITORY}}:docker-command-v${{ github.run_number }}
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
