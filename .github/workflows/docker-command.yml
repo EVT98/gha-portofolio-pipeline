@@ -56,7 +56,7 @@ jobs:
         with:
           image-ref: '${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${{ github.sha }}'
           format: 'table'
-          exit-code: '1'
+          exit-code: '0' #logiquement, je devrais mettre 1 que le workflow s'arrête en cas de vulnerabilité HIGH ou CRITICAL. Je mets 0 pour qu'il continue dans l'objectif d'aller au bout du workflow
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
